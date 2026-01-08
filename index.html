@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lanche da Madrugada - Cardápio Digital</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset e configurações gerais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary-red: #d32f2f;
+            --dark-red: #b71c1c;
+            --yellow: #ffc107;
+            --dark-yellow: #ff8f00;
+            --black: #212121;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --white: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --border-radius: 12px;
+        }
+        
+        body {
+            background-color: var(--black);
+            color: var(--white);
+            line-height: 1.6;
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        
+        /* Estilos para telas (seções) */
+        .screen {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+            padding: 20px 0 80px;
+            transition: all 0.3s ease;
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        /* Tela inicial */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.9)), url('https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .logo {
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            font-size: 3.5rem;
+            color: var(--yellow);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .logo .tagline {
+            font-size: 1.3rem;
+            color: var(--white);
+            font-weight: 300;
+        }
+        
+        .hero p {
+            font-size: 1.4rem;
+            margin-bottom: 40px;
+            max-width: 600px;
+            color: var(--light-gray);
+        }
+        
+        /* Botões */
+        .btn {
+            display: inline-block;
+            padding: 18px 32px;
+            background-color: var(--primary-red);
+            color: var(--white);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            text-align: center;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .btn:hover {
+            background-color: var(--dark-red);
+            transform: translateY(-3px);
+        }
+        
+        .btn-yellow {
+            background-color: var(--yellow);
+            color: var(--black);
+        }
+        
+        .btn-yellow:hover {
+            background-color: var(--dark-yellow);
+        }
+        
+        .btn-large {
+            font-size: 1.4rem;
+            padding: 20px 40px;
+        }
+        
+        .btn-share {
+            background-color: #25D366;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-share:hover {
+            background-color: #1da851;
+        }
+        
+        .btn-share-secondary {
+            background-color: #4267B2;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-share-secondary:hover {
+            background-color: #365899;
+        }
+        
+        /* Cardápio */
+        .categories {
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .category-btn {
+            padding: 12px 24px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50px;
+            color: var(--white);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .category-btn.active {
+            background-color: var(--yellow);
+            color: var(--black);
+            font-weight: 600;
+        }
+        
+        .category-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .category-btn.active:hover {
+            background-color: var(--dark-yellow);
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 100px;
+        }
+        
+        .menu-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+            border-color: var(--yellow);
+        }
+        
+        .item-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 3px solid var(--yellow);
+        }
+        
+        .item-info {
+            padding: 20px;
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .item-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--yellow);
+        }
+        
+        .item-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--white);
+            background-color: var(--primary-red);
+            padding: 5px 12px;
+            border-radius: 20px;
+        }
+        
+        .item-description {
+            color: var(--light-gray);
+            margin-bottom: 20px;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        
+        .add-to-cart {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-red);
+            color: var(--white);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .add-to-cart:hover {
+            background-color: var(--dark-red);
+        }
+        
+        /* Carrinho flutuante */
+        .floating-cart {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary-red);
+            color: var(--white);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .floating-cart:hover {
+            transform: scale(1.1);
+            background-color: var(--dark-red);
+        }
+        
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--yellow);
+            color: var(--black);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        
+        /* Botão de compartilhar flutuante */
+        .floating-share {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background-color: #25D366;
+            color: var(--white);
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .floating-share:hover {
+            transform: scale(1.1);
+            background-color: #1da851;
+        }
+        
+        /* Carrinho lateral */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 100%;
+            max-width: 380px;
+            height: 100%;
+            background-color: var(--black);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            transition: right 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            border-left: 2px solid var(--yellow);
+        }
+        
+        .cart-sidebar.active {
+            right: 0;
+        }
+        
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--primary-red);
+            color: var(--white);
+        }
+        
+        .cart-header h3 {
+            font-size: 1.6rem;
+        }
+        
+        .close-cart {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+        
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .cart-item-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 15px;
+        }
+        
+        .cart-item-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .cart-item-details {
+            flex: 1;
+        }
+        
+        .cart-item-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 5px;
+        }
+        
+        .cart-item-price {
+            color: var(--yellow);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .quantity-btn {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary-red);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .quantity-btn:hover {
+            background-color: var(--dark-red);
+        }
+        
+        .item-quantity {
+            font-size: 1.2rem;
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
+        }
+        
+        .remove-item {
+            background-color: transparent;
+            border: none;
+            color: var(--gray);
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .remove-item:hover {
+            color: var(--primary-red);
+        }
+        
+        .cart-footer {
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-top: 2px solid var(--yellow);
+        }
+        
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--yellow);
+        }
+        
+        /* Tela de finalização */
+        .order-summary {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .summary-title {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--yellow);
+            margin-bottom: 30px;
+        }
+        
+        .summary-items {
+            margin-bottom: 30px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--yellow);
+            border-top: 2px solid rgba(255, 255, 255, 0.2);
+            margin-top: 20px;
+        }
+        
+        .pix-info {
+            background-color: rgba(255, 193, 7, 0.1);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin: 30px 0;
+            text-align: center;
+            border: 1px solid var(--yellow);
+        }
+        
+        .pix-key {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--white);
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            word-break: break-all;
+            margin: 15px 0;
+            border: 1px dashed var(--yellow);
+        }
+        
+        .instruction {
+            font-size: 1.4rem;
+            text-align: center;
+            margin: 30px 0;
+            color: var(--yellow);
+            font-weight: 600;
+        }
+        
+        /* Tela do garçom */
+        .waiter-screen {
+            background-color: var(--black);
+            color: var(--white);
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .order-header {
+            margin-bottom: 30px;
+        }
+        
+        .order-id {
+            font-size: 2.5rem;
+            color: var(--yellow);
+            margin-bottom: 10px;
+        }
+        
+        .order-time {
+            font-size: 1.5rem;
+            color: var(--light-gray);
+        }
+        
+        .waiter-items {
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        
+        .waiter-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 18px 0;
+            font-size: 1.4rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .waiter-total {
+            font-size: 2.5rem;
+            color: var(--yellow);
+            font-weight: 700;
+            margin: 40px 0;
+        }
+        
+        /* Tela de compartilhamento */
+        .share-screen {
+            background-color: var(--black);
+            color: var(--white);
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .share-content {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .share-title {
+            font-size: 2rem;
+            color: var(--yellow);
+            margin-bottom: 20px;
+        }
+        
+        .share-message {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: var(--light-gray);
+            line-height: 1.6;
+        }
+        
+        .share-location {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            border-left: 4px solid var(--yellow);
+        }
+        
+        .share-location h3 {
+            color: var(--yellow);
+            margin-bottom: 10px;
+        }
+        
+        .share-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        /* Overlay para o carrinho */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            display: none;
+        }
+        
+        .overlay.active {
+            display: block;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .logo h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+            
+            .menu-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 18px;
+            }
+            
+            .cart-sidebar {
+                max-width: 100%;
+            }
+            
+            .waiter-item {
+                font-size: 1.2rem;
+            }
+            
+            .order-id {
+                font-size: 2rem;
+            }
+            
+            .floating-share {
+                bottom: 100px;
+                right: 20px;
+            }
+            
+            .item-image {
+                height: 160px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo h1 {
+                font-size: 2.2rem;
+            }
+            
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .category-btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .btn {
+                padding: 16px 24px;
+                font-size: 1.1rem;
+            }
+            
+            .item-image {
+                height: 150px;
+            }
+        }
+        
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        /* Estilo para imagem padrão quando não carrega */
+        .image-placeholder {
+            width: 100%;
+            height: 180px;
+            background-color: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            border-bottom: 3px solid var(--yellow);
+        }
+        
+        .image-placeholder i {
+            font-size: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay para carrinho -->
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Tela inicial -->
+    <section class="screen active" id="home-screen">
+        <div class="hero">
+            <div class="logo">
+                <h1>Lanche da Madrugada</h1>
+                <div class="tagline">Sabor que não dorme nunca</div>
+            </div>
+            <p>Monte seu pedido direto pelo celular, rápido e sem complicação!</p>
+            <button class="btn btn-yellow btn-large" id="start-order">Começar pedido</button>
+            <button class="btn btn-share" id="share-home">
+                <i class="fas fa-share-alt"></i> Indicar para amigos
+            </button>
+        </div>
+    </section>
+    
+    <!-- Cardápio -->
+    <section class="screen" id="menu-screen">
+        <div class="container">
+            <h2 style="text-align: center; margin: 30px 0; font-size: 2.2rem; color: var(--yellow);">Cardápio</h2>
+            
+            <!-- Categorias -->
+            <div class="categories">
+                <button class="category-btn active" data-category="all">Todos</button>
+                <button class="category-btn" data-category="lanches">Lanches</button>
+                <button class="category-btn" data-category="porcoes">Porções</button>
+                <button class="category-btn" data-category="bebidas">Bebidas</button>
+                <button class="category-btn" data-category="combos">Combos</button>
+            </div>
+            
+            <!-- Itens do cardápio -->
+            <div class="menu-grid" id="menu-items">
+                <!-- Itens serão inseridos aqui via JavaScript -->
+            </div>
+        </div>
+    </section>
+    
+    <!-- Carrinho flutuante -->
+    <div class="floating-cart" id="floating-cart">
+        <i class="fas fa-shopping-cart"></i>
+        <div class="cart-badge" id="cart-badge">0</div>
+    </div>
+    
+    <!-- Botão de compartilhar flutuante -->
+    <div class="floating-share" id="floating-share">
+        <i class="fas fa-share-alt"></i>
+    </div>
+    
+    <!-- Carrinho lateral -->
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h3>Seu Pedido</h3>
+            <button class="close-cart" id="close-cart">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="cart-items" id="cart-items-container">
+            <!-- Itens do carrinho serão inseridos aqui -->
+        </div>
+        
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-total">R$ 0,00</span>
+            </div>
+            <button class="btn btn-yellow" id="finish-order">Finalizar Pedido</button>
+        </div>
+    </div>
+    
+    <!-- Tela de finalização -->
+    <section class="screen" id="checkout-screen">
+        <div class="container">
+            <div class="order-summary fade-in">
+                <h2 class="summary-title">✅ Pedido Confirmado!</h2>
+                
+                <div class="summary-items" id="order-summary-items">
+                    <!-- Resumo do pedido será inserido aqui -->
+                </div>
+                
+                <div class="summary-total">
+                    <span>Total a pagar:</span>
+                    <span id="order-total">R$ 0,00</span>
+                </div>
+                
+                <div class="pix-info">
+                    <h3 style="color: var(--yellow); margin-bottom: 15px;">PIX do Estabelecimento</h3>
+                    <p>Use a chave PIX abaixo para pagar seu pedido:</p>
+                    <div class="pix-key" id="pix-key">lanchedamadrugada@empresa.com</div>
+                    <p>Ou escaneie o código QR ao lado (se disponível)</p>
+                </div>
+                
+                <div class="instruction">
+                    "Chame o garçom e mostre esta tela para confirmar seu pedido."
+                </div>
+                
+                <button class="btn btn-yellow btn-large" id="show-waiter">📋 Mostrar pedido para o garçom</button>
+                <button class="btn" style="margin-top: 15px;" id="back-to-menu">Voltar ao cardápio</button>
+                <button class="btn btn-share" style="margin-top: 10px;" id="share-checkout">
+                    <i class="fas fa-share-alt"></i> Indicar este lugar
+                </button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Tela do garçom -->
+    <section class="screen" id="waiter-screen">
+        <div class="waiter-screen">
+            <div class="order-header">
+                <div class="order-id" id="waiter-order-id">Pedido #1023</div>
+                <div class="order-time" id="waiter-order-time">20/05/2023 03:45</div>
+            </div>
+            
+            <div class="waiter-items" id="waiter-items">
+                <!-- Itens para o garçom serão inseridos aqui -->
+            </div>
+            
+            <div class="waiter-total" id="waiter-total">Total: R$ 0,00</div>
+            
+            <p style="font-size: 1.4rem; margin-bottom: 40px; color: var(--light-gray);">
+                Pedido confirmado pelo cliente via sistema digital.
+            </p>
+            
+            <button class="btn btn-yellow btn-large" id="back-to-checkout">Voltar para o resumo</button>
+        </div>
+    </section>
+    
+    <!-- Tela de compartilhamento -->
+    <section class="screen" id="share-screen">
+        <div class="share-screen">
+            <div class="share-content fade-in">
+                <h2 class="share-title">Indicar para Amigos</h2>
+                
+                <div class="share-message">
+                    Compartilhe com seus amigos que você descobriu um lugar incrível!
+                </div>
+                
+                <div class="share-location">
+                    <h3>Lanche da Madrugada</h3>
+                    <p>📍 Av. Principal, 1234 - Centro</p>
+                    <p>⏰ Aberto das 18h às 6h</p>
+                    <p>📞 (11) 99999-9999</p>
+                </div>
+                
+                <p style="margin-bottom: 20px; font-size: 1.1rem;">
+                    <strong>Mensagem para compartilhar:</strong>
+                </p>
+                
+                <div class="pix-key" id="share-message-text" style="cursor: pointer; font-size: 1.1rem;">
+                    🍔 Olha onde estou! Descobri um lugar incrível chamado "Lanche da Madrugada"! 
+                    Melhor hambúrguer da cidade, atendimento top e aberto a noite toda! 
+                    Vem conhecer comigo! 🍟🥤
+                    
+                    📍 Localização: Av. Principal, 1234 - Centro
+                    ⏰ Horário: 18h às 6h
+                </div>
+                
+                <p style="margin-top: 15px; color: var(--yellow); font-size: 0.9rem;">
+                    Clique na mensagem acima para copiar
+                </p>
+                
+                <div class="share-options">
+                    <button class="btn btn-share" id="share-whatsapp">
+                        <i class="fab fa-whatsapp"></i> Compartilhar no WhatsApp
+                    </button>
+                    
+                    <button class="btn btn-share-secondary" id="share-facebook">
+                        <i class="fab fa-facebook"></i> Compartilhar no Facebook
+                    </button>
+                    
+                    <button class="btn" id="share-copy">
+                        <i class="far fa-copy"></i> Copiar mensagem
+                    </button>
+                    
+                    <button class="btn" id="back-from-share">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Dados do cardápio com imagens
+        const menuData = {
+            lanches: [
+                {
+                    id: 1,
+                    name: "X-Burguer Especial",
+                    description: "Pão, hambúrguer 180g, queijo, presunto, bacon, alface, tomate e maionese da casa",
+                    price: 24.90,
+                    category: "lanches",
+                    image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: 2,
+                    name: "X-Tudo",
+                    description: "Pão, 2 hambúrgueres, queijo, presunto, bacon, ovo, alface, tomate, milho, batata palha e maionese",
+                    price: 32.90,
+                    category: "lanches",
+                    image: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: 3,
+                    name: "X-Frango",
+                    description: "Pão, filé de frango empanado, queijo, alface, tomate e maionese",
+                    price: 22.90,
+                    category: "lanches",
+                    image: "https://images.unsplash.com/photo-1603064752734-4c48eff53d05?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: 4,
+                    name: "X-Bacon",
+                    description: "Pão, hambúrguer 180g, queijo, bacon crocante, cebola caramelizada e molho barbecue",
+                    price: 28.50,
+                    category: "lanches",
+                    image: "https://images.unsplash.com/photo-1526234362653-3b75a0c07438?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                }
+            ],
+            porcoes: [
+                {
+                    id: 5,
+                    name: "Porção de Batata Frita",
+                    description: "Batata frita crocante acompanhada de ketchup e maionese",
+                    price: 18.90,
+                    category: "porcoes",
+                    image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: 6,
+                    name: "Porção de Frango à Passarinho",
+                    description: "Frango à passarinho temperado com alho e limão, acompanha molho especial",
+                    price: 36.90,
+                    category: "porcoes",
+                    image: "https://images.unsplash.com/photo-1626645738675-4c5dcf9e3e0e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: 7,
+                    name: "Porção de Calabresa Acebolada",
+                    description: "Calabresa fatiada com cebola, pimentão e azeitonas",
+                    price: 29.90,
+                    category: "porcoes",
+                    image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: 8,
+                    name: "Anéis de Cebola",
+                    description: "Cebola empanada frita, crocante por fora e macia por dentro",
+                    price: 16.90,
+                    category: "porcoes",
+                    image: "https://images.unsplash.com/photo-1632770401209-7e0b7d8dc5ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                }
+            ],
+            bebidas: [
+                {
+                    id: 9,
+                    name: "Refrigerante 2L",
+                    description: "Coca-Cola, Guaraná, Fanta ou Sprite",
+                    price: 12.90,
+                    category: "bebidas",
+                    image: "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: 10,
+                    name: "Refrigerante 600ml",
+                    description: "Coca-Cola, Guaraná, Fanta ou Sprite",
+                    price: 8.90,
+                    category: "bebidas",
+                    image: "https://images.unsplash.com/photo-1603561596112-0a132b757442?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: 11,
+                    name: "Suco Natural 500ml",
+                    description: "Laranja, Limão, Abacaxi ou Maracujá",
+                    price: 9.90,
+                    category: "bebidas",
+                    image: "https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: 12,
+                    name: "Água Mineral 500ml",
+                    description: "Com ou sem gás",
+                    price: 4.90,
+                    category: "bebidas",
+                    image: "https://images.unsplash.com/photo-1523362628745-0c100150b504?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                }
+            ],
+            combos: [
+                {
+                    id: 13,
+                    name: "Combo Família",
+                    description: "2 X-Tudo + Porção de Batata Frita + Refrigerante 2L",
+                    price: 89.90,
+                    category: "combos",
+                    image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: 14,
+                    name: "Combo Casal",
+                    description: "2 X-Burguer Especial + Porção de Anéis de Cebola + 2 Refrigerantes 600ml",
+                    price: 64.90,
+                    category: "combos",
+                    image: "https://images.unsplash.com/photo-1550547660-d9450f859349?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                },
+                {
+                    id: 15,
+                    name: "Combo Madrugada",
+                    description: "X-Bacon + Porção de Calabresa + Refrigerante 600ml",
+                    price: 52.90,
+                    category: "combos",
+                    image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+                }
+            ]
+        };
+
+        // Estado do aplicativo
+        let cart = JSON.parse(localStorage.getItem('lancheDaMadrugadaCart')) || [];
+        let currentOrderId = localStorage.getItem('lancheDaMadrugadaOrderId') || 1023;
+        
+        // Elementos DOM
+        const screens = document.querySelectorAll('.screen');
+        const floatingCart = document.getElementById('floating-cart');
+        const floatingShare = document.getElementById('floating-share');
+        const cartBadge = document.getElementById('cart-badge');
+        const cartSidebar = document.getElementById('cart-sidebar');
+        const overlay = document.getElementById('overlay');
+        const closeCartBtn = document.getElementById('close-cart');
+        const cartItemsContainer = document.getElementById('cart-items-container');
+        const cartTotal = document.getElementById('cart-total');
+        const menuItemsContainer = document.getElementById('menu-items');
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Renderizar cardápio
+            renderMenuItems('all');
+            
+            // Atualizar carrinho
+            updateCart();
+            
+            // Event listeners principais
+            document.getElementById('start-order').addEventListener('click', () => switchScreen('menu-screen'));
+            document.getElementById('finish-order').addEventListener('click', finishOrder);
+            document.getElementById('show-waiter').addEventListener('click', showWaiterScreen);
+            document.getElementById('back-to-menu').addEventListener('click', () => switchScreen('menu-screen'));
+            document.getElementById('back-to-checkout').addEventListener('click', () => switchScreen('checkout-screen'));
+            document.getElementById('back-from-share').addEventListener('click', () => switchScreen('menu-screen'));
+            
+            // Event listeners para compartilhamento
+            document.getElementById('share-home').addEventListener('click', () => switchScreen('share-screen'));
+            document.getElementById('share-checkout').addEventListener('click', () => switchScreen('share-screen'));
+            floatingShare.addEventListener('click', () => switchScreen('share-screen'));
+            document.getElementById('share-whatsapp').addEventListener('click', shareWhatsApp);
+            document.getElementById('share-facebook').addEventListener('click', shareFacebook);
+            document.getElementById('share-copy').addEventListener('click', copyShareMessage);
+            document.getElementById('share-message-text').addEventListener('click', copyShareMessage);
+            
+            // Event listeners para carrinho
+            floatingCart.addEventListener('click', openCart);
+            closeCartBtn.addEventListener('click', closeCart);
+            overlay.addEventListener('click', closeCart);
+            
+            // Event listeners para categorias
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remover classe active de todos os botões
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                    // Adicionar classe active ao botão clicado
+                    this.classList.add('active');
+                    // Filtrar itens por categoria
+                    const category = this.getAttribute('data-category');
+                    renderMenuItems(category);
+                });
+            });
+        });
+        
+        // Funções para gerenciar telas
+        function switchScreen(screenId) {
+            screens.forEach(screen => {
+                screen.classList.remove('active');
+                if (screen.id === screenId) {
+                    screen.classList.add('active');
+                }
+            });
+            
+            // Fechar carrinho se estiver aberto
+            closeCart();
+            
+            // Se for para a tela de checkout, atualizar o resumo
+            if (screenId === 'checkout-screen') {
+                updateOrderSummary();
+            }
+            
+            // Se for para a tela do garçom, atualizar
+            if (screenId === 'waiter-screen') {
+                updateWaiterScreen();
+            }
+            
+            // Mostrar/ocultar botões flutuantes conforme a tela
+            if (screenId === 'menu-screen' || screenId === 'checkout-screen') {
+                floatingCart.style.display = 'flex';
+                floatingShare.style.display = 'flex';
+            } else {
+                floatingCart.style.display = 'none';
+                floatingShare.style.display = 'none';
+            }
+        }
+        
+        // Funções do carrinho
+        function openCart() {
+            cartSidebar.classList.add('active');
+            overlay.classList.add('active');
+        }
+        
+        function closeCart() {
+            cartSidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+        
+        function updateCart() {
+            // Atualizar badge do carrinho
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartBadge.textContent = totalItems;
+            
+            // Atualizar itens do carrinho
+            renderCartItems();
+            
+            // Atualizar total
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartTotal.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            
+            // Salvar no localStorage
+            localStorage.setItem('lancheDaMadrugadaCart', JSON.stringify(cart));
+        }
+        
+        function renderCartItems() {
+            cartItemsContainer.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p style="text-align: center; color: var(--gray); margin-top: 30px;">Seu carrinho está vazio</p>';
+                return;
+            }
+            
+            cart.forEach(item => {
+                // Encontrar a imagem do item
+                let itemImage = '';
+                for (const category in menuData) {
+                    const found = menuData[category].find(menuItem => menuItem.id === item.id);
+                    if (found && found.image) {
+                        itemImage = found.image;
+                        break;
+                    }
+                }
+                
+                const cartItemElement = document.createElement('div');
+                cartItemElement.className = 'cart-item';
+                cartItemElement.innerHTML = `
+                    <div class="cart-item-info">
+                        ${itemImage ? 
+                            `<img src="${itemImage}" alt="${item.name}" class="cart-item-image" onerror="this.onerror=null; this.src=''; this.parentNode.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-hamburger\'></i></div>';">` : 
+                            `<div class="image-placeholder"><i class="fas fa-hamburger"></i></div>`
+                        }
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">R$ ${item.price.toFixed(2).replace('.', ',')}</div>
+                        </div>
+                    </div>
+                    <div class="cart-item-controls">
+                        <button class="quantity-btn minus" data-id="${item.id}">-</button>
+                        <span class="item-quantity">${item.quantity}</span>
+                        <button class="quantity-btn plus" data-id="${item.id}">+</button>
+                        <button class="remove-item" data-id="${item.id}"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                
+                cartItemsContainer.appendChild(cartItemElement);
+            });
+            
+            // Adicionar event listeners aos botões do carrinho
+            document.querySelectorAll('.quantity-btn.minus').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    updateItemQuantity(id, -1);
+                });
+            });
+            
+            document.querySelectorAll('.quantity-btn.plus').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    updateItemQuantity(id, 1);
+                });
+            });
+            
+            document.querySelectorAll('.remove-item').forEach(button => {
+                button.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    removeItemFromCart(id);
+                });
+            });
+        }
+        
+        function addToCart(itemId) {
+            // Encontrar o item no cardápio
+            let selectedItem = null;
+            for (const category in menuData) {
+                const found = menuData[category].find(item => item.id === itemId);
+                if (found) {
+                    selectedItem = found;
+                    break;
+                }
+            }
+            
+            if (!selectedItem) return;
+            
+            // Verificar se o item já está no carrinho
+            const existingItem = cart.find(item => item.id === itemId);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: selectedItem.id,
+                    name: selectedItem.name,
+                    price: selectedItem.price,
+                    quantity: 1,
+                    image: selectedItem.image
+                });
+            }
+            
+            updateCart();
+            
+            // Feedback visual
+            const button = event.target.closest('.add-to-cart');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i> Adicionado!';
+            button.style.backgroundColor = '#4caf50';
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.backgroundColor = '';
+            }, 1500);
+        }
+        
+        function updateItemQuantity(itemId, change) {
+            const item = cart.find(item => item.id === itemId);
+            
+            if (item) {
+                item.quantity += change;
+                
+                if (item.quantity <= 0) {
+                    removeItemFromCart(itemId);
+                } else {
+                    updateCart();
+                }
+            }
+        }
+        
+        function removeItemFromCart(itemId) {
+            cart = cart.filter(item => item.id !== itemId);
+            updateCart();
+        }
+        
+        // Funções do cardápio
+        function renderMenuItems(category) {
+            menuItemsContainer.innerHTML = '';
+            
+            // Coletar todos os itens baseado na categoria selecionada
+            let itemsToRender = [];
+            
+            if (category === 'all') {
+                for (const cat in menuData) {
+                    itemsToRender = itemsToRender.concat(menuData[cat]);
+                }
+            } else {
+                itemsToRender = menuData[category] || [];
+            }
+            
+            // Renderizar cada item
+            itemsToRender.forEach(item => {
+                const menuItemElement = document.createElement('div');
+                menuItemElement.className = 'menu-item fade-in';
+                menuItemElement.innerHTML = `
+                    ${item.image ? 
+                        `<img src="${item.image}" alt="${item.name}" class="item-image" onerror="this.onerror=null; this.src=''; this.parentNode.innerHTML='<div class=\'image-placeholder\'><i class=\'fas fa-hamburger\'></i></div><div class=\'item-info\'><div class=\'item-header\'><div class=\'item-name\'>${item.name}</div><div class=\'item-price\'>R$ ${item.price.toFixed(2).replace('.', ',')}</div></div><div class=\'item-description\'>${item.description}</div><button class=\'add-to-cart\' data-id=\'${item.id}\'><i class=\'fas fa-plus\'></i> Adicionar</button></div>';">` : 
+                        `<div class="image-placeholder"><i class="fas fa-hamburger"></i></div>`
+                    }
+                    <div class="item-info">
+                        <div class="item-header">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-price">R$ ${item.price.toFixed(2).replace('.', ',')}</div>
+                        </div>
+                        <div class="item-description">${item.description}</div>
+                        <button class="add-to-cart" data-id="${item.id}">
+                            <i class="fas fa-plus"></i> Adicionar
+                        </button>
+                    </div>
+                `;
+                
+                menuItemsContainer.appendChild(menuItemElement);
+            });
+            
+            // Adicionar event listeners aos botões "Adicionar"
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemId = parseInt(this.getAttribute('data-id'));
+                    addToCart(itemId);
+                });
+            });
+        }
+        
+        // Funções de finalização
+        function finishOrder() {
+            if (cart.length === 0) {
+                alert('Adicione itens ao carrinho antes de finalizar!');
+                return;
+            }
+            
+            // Incrementar o número do pedido
+            currentOrderId++;
+            localStorage.setItem('lancheDaMadrugadaOrderId', currentOrderId);
+            
+            switchScreen('checkout-screen');
+        }
+        
+        function updateOrderSummary() {
+            const orderSummaryItems = document.getElementById('order-summary-items');
+            const orderTotal = document.getElementById('order-total');
+            
+            let itemsHTML = '';
+            let total = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                
+                itemsHTML += `
+                    <div class="summary-item">
+                        <span>${item.quantity}x ${item.name}</span>
+                        <span>R$ ${itemTotal.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                `;
+            });
+            
+            orderSummaryItems.innerHTML = itemsHTML;
+            orderTotal.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+        
+        function showWaiterScreen() {
+            switchScreen('waiter-screen');
+        }
+        
+        function updateWaiterScreen() {
+            const waiterOrderId = document.getElementById('waiter-order-id');
+            const waiterOrderTime = document.getElementById('waiter-order-time');
+            const waiterItems = document.getElementById('waiter-items');
+            const waiterTotal = document.getElementById('waiter-total');
+            
+            // Atualizar ID do pedido
+            waiterOrderId.textContent = `Pedido #${currentOrderId}`;
+            
+            // Atualizar hora atual
+            const now = new Date();
+            const formattedTime = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth()+1).toString().padStart(2, '0')}/${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            waiterOrderTime.textContent = formattedTime;
+            
+            // Atualizar itens
+            let itemsHTML = '';
+            let total = 0;
+            
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                
+                itemsHTML += `
+                    <div class="waiter-item">
+                        <span>${item.quantity}x ${item.name}</span>
+                        <span>R$ ${itemTotal.toFixed(2).replace('.', ',')}</span>
+                    </div>
+                `;
+            });
+            
+            waiterItems.innerHTML = itemsHTML;
+            waiterTotal.textContent = `Total: R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+        
+        // Funções de compartilhamento
+        function getShareMessage() {
+            return `🍔 Olha onde estou! Descobri um lugar incrível chamado "Lanche da Madrugada"! 
+Melhor hambúrguer da cidade, atendimento top e aberto a noite toda! 
+Vem conhecer comigo! 🍟🥤
+
+📍 Localização: Av. Principal, 1234 - Centro
+⏰ Horário: 18h às 6h
+📞 Telefone: (11) 99999-9999
+
+#LancheDaMadrugada #Hamburgueria #ComidaBoas #AbertoATodaHora`;
+        }
+        
+        function shareWhatsApp() {
+            const message = encodeURIComponent(getShareMessage());
+            const url = `https://wa.me/?text=${message}`;
+            window.open(url, '_blank');
+        }
+        
+        function shareFacebook() {
+            const message = encodeURIComponent(getShareMessage());
+            const url = `https://www.facebook.com/sharer/sharer.php?quote=${message}`;
+            window.open(url, '_blank');
+        }
+        
+        function copyShareMessage() {
+            const message = getShareMessage();
+            navigator.clipboard.writeText(message).then(() => {
+                alert('Mensagem copiada para a área de transferência! Agora é só colar no WhatsApp, Instagram ou onde quiser!');
+            }).catch(err => {
+                console.error('Erro ao copiar texto: ', err);
+                // Fallback para dispositivos sem suporte a clipboard API
+                const textArea = document.createElement('textarea');
+                textArea.value = message;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Mensagem copiada para a área de transferência!');
+            });
+        }
+        
+        // Configuração da chave PIX (pode ser alterada facilmente)
+        const pixKey = "lanchedamadrugada@empresa.com"; // Altere aqui para a chave PIX real
+        
+        // Inicializar chave PIX na interface
+        document.getElementById('pix-key').textContent = pixKey;
+    </script>
+</body>
+</html>
